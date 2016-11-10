@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Turbo Disco</title>
+    <script src="https://jashkenas.github.io/underscore/underscore-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.0/zepto.min.js"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css?family=Permanent+Marker');
+      *{
+        box-sizing: border-box;
+      }
+      body, html{
+        width: 100%;
+        margin: 0;
+        font-family: 'Permanent Marker', cursive;
+        background-image: url(background.png);
+        background-attachment: fixed;
+      }
+      #logo{
+        font-size: 3rem;
+        text-align: center;
+        margin: 2rem;
+      }
+      .photo{
+        display: block;
+        margin: auto;
+        margin-bottom: 2rem;
+        box-shadow: 0 1px 2px rgba(0,0,0,.3);
+      }
+      #show-more{
+        text-align: center;
+        cursor: pointer;
+        font-size: 2rem;
+        margin-bottom: 4rem;
+        text-shadow: 0 1px 2px rgba(0,0,0,.3);
+      }
+      #show-more:hover{
+        color: greenyellow;
+        text-shadow: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 id="logo">&#127796;Turbo Disco&#127796;</h1>
+    <div id="photos"></div>
+    <div id="show-more">MORE</div>
+    <script>
+      //
+      //  CONFIGURATION
+      //
+      var flickr_api_key = '75f6140f13150a17b9de27e62b362913';
+      var photo_set_id = '72157635072160119';
+      var per_page = 10;
+
+
+      //
+      //  INTERNAL
+      //
+      var photo_list = [];
+      var total_photos = null;
+
+      // doc: Takes some params and builds a flickr api url
+      var flickr_url_builder = function(params) {
+        var base_url = 'https://api.flickr.com/services/rest/';
+
+        params.format = 'json'
+        params.nojsoncallback = '1'
+        params.api_key = flickr_api_key;
+
+        params_list = _.map(params, function(val, key){
+          return key + "=" + val;
+        })
+
+        return base_url + "?" + params_list.join("&");
+      }
+
+      // doc: Takes a photo_set_id
+      var photos_for_set_url = function(photo_set_id, page, per_page){
+        return flickr_url_builder({
+          'method': 'flickr.photosets.getPhotos',
+          'photoset_id': photo_set_id,
+          'user_id': '55668854%40N07',
+          'page': page,
+          'per_page': per_page
+        });
+      }
+
+      var photo_info_url = function(photo_id){
+        return flickr_url_builder({
+          'method': 'flickr.photos.getSizes',
+          'photo_id': photo_id
+        })
+      }
+
+      var load_photo = function(index, cb){
+        $.get(photos_for_set_url(photo_set_id, index, 1), function(resp){
+          $.get(photo_info_url(resp.photoset.photo[0].id), function(resp){
+            photo_list[index] = resp.sizes.size;
+            cb();
+          });
+        });
+      }
+
+      var show_photo = function(index, cb){
+        if(photo_list.length <= index){
+          load_photo(index, function(){
+            do_show_photo(index);
+            cb();
+          });
+        } else {
+          do_show_photo(index);
+          cb();
+        }
+      }
+
+      var do_show_photo = function(index){
+        medium_800 = _.find(photo_list[index], function(size){
+            return size.label == "Medium 800";
+          })
+        if(medium_800) $('#photos').append('<img class="photo" src="'+ medium_800.source +'">');
+      }
+
+
+      var show_more_photos = function(count){
+        console.log(count)
+        if(count === 0){
+          $("#show-more").show();
+        } else {
+          $("#show-more").hide();
+          show_photo(photo_list.length + 1, function(){
+            show_more_photos(count - 1)
+          });
+        }
+      }
+
+      // Kick it off
+      $('#show-more').on('click', function(){show_more_photos(10)});
+      show_more_photos(10)
+    </script>
+
+    <!-- Rainbow Text -->
+    <script>
+        var step = 30, // colorChage step, use negative value to change direction
+            ms   = 100,  // loop every
+            $uni = $('#logo'),
+            txt  = $uni.text(),
+            len  = txt.length,
+            lev  = 360/len,
+            newCont = "",
+            itv;
+
+        for(var i=0; i<len; i++){
+            newCont += "<span style='color:hsla("+ i*lev +", 100%, 50%, 1)'>"+ txt.charAt(i) +"</span>";
+        }
+
+        $uni.html(newCont); // Replace with new content
+        var $ch = $uni.find('span'); // character
+
+        function anim(){
+          itv = setInterval(function(){
+            $ch.each(function(){
+              var h = +$(this).attr('style').split(',')[0].split('(')[1]-step % 360;
+              $(this).attr({style:"color:hsla("+ h +", 100%, 50%, 1)"});
+            });
+          }, ms);
+        }
+        function stop(){ clearInterval(itv); }
+
+        anim()
+    </script>
+  </body>
+</html>
