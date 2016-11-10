@@ -93,7 +93,7 @@
       }
 
       var load_photo = function(index, cb){
-        $.get(photos_for_set_url(photo_set_id, index, 1), function(resp){
+        $.get(photos_for_set_url(photo_set_id, index+1, 1), function(resp){
           $.get(photo_info_url(resp.photoset.photo[0].id), function(resp){
             photo_list[index] = resp.sizes.size;
             cb();
