@@ -115,7 +115,7 @@
 
       var do_show_photo = function(index){
         medium_800 = _.find(photo_list[index-1], function(size){
-            return size.label == "Medium 800";
+            return size.label == "Medium 800" || size.label == "Original";
           })
         if(medium_800) $('#photos').append('<img class="photo" src="'+ medium_800.source +'">');
       }
