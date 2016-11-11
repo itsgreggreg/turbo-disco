@@ -24,17 +24,18 @@
       .photo{
         display: block;
         margin: auto;
-        margin-bottom: 2rem;
+        margin-bottom: 5rem;
         box-shadow: 0 1px 2px rgba(0,0,0,.3);
-      }
-      #show-more{
-        text-align: center;
         cursor: pointer;
+      }
+      #show-more, #loading{
+        text-align: center;
         font-size: 2rem;
         margin-bottom: 4rem;
         text-shadow: 0 1px 2px rgba(0,0,0,.3);
       }
       #show-more:hover{
+        cursor: pointer;
         color: greenyellow;
         text-shadow: none;
       }
@@ -44,6 +45,7 @@
     <h1 id="logo">&#127796;Turbo Disco&#127796;</h1>
     <div id="photos"></div>
     <div id="show-more">Mas</div>
+    <div id="loading">Loading</div>
     <script>
       //
       //  CONFIGURATION
@@ -114,18 +116,24 @@
       }
 
       var do_show_photo = function(index){
-        medium_800 = _.find(photo_list[index-1], function(size){
-            return size.label == "Medium 800" || size.label == "Original";
+        var medium_800 = _.find(photo_list[index-1], function(size){
+            return size.label === "Medium 800" || size.label == "Original";
           })
-        if(medium_800) $('#photos').append('<img class="photo" src="'+ medium_800.source +'">');
+        var original = _.find(photo_list[index-1], function(size){
+            return size.label === "Original";
+          })
+        if(!original){ console.log(photo_list[index-1])}
+        if(medium_800) $('#photos').append('<a href="'+original.source+'"><img class="photo" data-index="'+(index-1)+'" src="'+ medium_800.source +'"></a>');
       }
 
 
       var show_more_photos = function(count){
         if(count === 0){
           $("#show-more").show();
+          $("#loading").hide();
         } else {
           $("#show-more").hide();
+          $("#loading").show();
           show_photo(photo_list.length, function(){
             show_more_photos(count - 1)
           });
