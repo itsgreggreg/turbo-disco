@@ -13,7 +13,7 @@
         width: 100%;
         margin: 0;
         font-family: 'Permanent Marker', cursive;
-        background-image: url(background.png);
+        background-color: #222;
         background-attachment: fixed;
       }
       #logo{
@@ -21,18 +21,24 @@
         text-align: center;
         margin: 2rem;
       }
+      #photos{
+        display: flex;
+        flex-direction: column;
+        padding: 0 40px;
+        align-items: center;
+      }
       .photo{
-        display: block;
-        margin: auto;
         margin-bottom: 5rem;
-        box-shadow: 0 1px 2px rgba(0,0,0,.3);
-        cursor: pointer;
+      }
+      .photo img{
+        box-shadow: 1px 2px 5px rgba(0,0,0,.6);
       }
       #show-more, #loading{
         text-align: center;
         font-size: 2rem;
         margin-bottom: 4rem;
-        text-shadow: 0 1px 2px rgba(0,0,0,.3);
+        text-shadow: 1px 2px 2px rgba(0,0,0,.9);
+        color: #999;
       }
       #show-more:hover{
         cursor: pointer;
@@ -50,7 +56,7 @@
       //
       //  CONFIGURATION
       //
-      var flickr_api_key = '75f6140f13150a17b9de27e62b362913';
+      var flickr_api_key = '2a4fe5815a846749d225ddd09567e7e5';
       var photo_set_id = '72157625218201105';
       var per_page = 10;
 
@@ -104,14 +110,14 @@
       }
 
       var show_photo = function(index, cb){
-        if(photo_list.length <= index){
+        if(photo_list[index]){
+          do_show_photo(index);
+          cb();
+        } else {
           load_photo(index, function(){
             do_show_photo(index);
             cb();
           });
-        } else {
-          do_show_photo(index);
-          cb();
         }
       }
 
@@ -123,7 +129,7 @@
             return size.label === "Original";
           })
         if(!original){ console.log(photo_list[index-1])}
-        if(medium_800) $('#photos').append('<a href="'+original.source+'"><img class="photo" data-index="'+(index-1)+'" src="'+ medium_800.source +'"></a>');
+        if(medium_800) $('#photos').append('<a class="photo" href="'+original.source+'"><img src="'+ medium_800.source +'"></a>');
       }
 
 
@@ -141,8 +147,8 @@
       }
 
       // Kick it off
-      $('#show-more').on('click', function(){show_more_photos(10)});
-      show_more_photos(10)
+      $('#show-more').on('click', function(){show_more_photos(per_page)});
+      show_more_photos(per_page)
     </script>
 
     <!-- Rainbow Text -->
