@@ -34,24 +34,18 @@
       .photo img{
         box-shadow: 1px 2px 5px rgba(0,0,0,.6);
       }
-      #show-more, #loading{
+      #loading{
         text-align: center;
         font-size: 2rem;
         margin-bottom: 4rem;
         text-shadow: 1px 2px 2px rgba(0,0,0,.9);
         color: #999;
       }
-      #show-more:hover{
-        cursor: pointer;
-        color: greenyellow;
-        text-shadow: none;
-      }
     </style>
   </head>
   <body>
     <h1 id="logo">🌴 <span>Turbo Disco</span> 🌴</h1>
     <div id="photos"></div>
-    <div id="show-more">Mas</div>
     <div id="loading">Loading</div>
     <script>
       //
@@ -67,6 +61,8 @@
       //
       var photo_list = [];
       var total_photos = null;
+      var $html = $("html");
+      var $win = $(window);
 
       // doc: Takes some params and builds a flickr api url
       var flickr_url_builder = function(params) {
@@ -83,7 +79,6 @@
         return base_url + "?" + params_list.join("&");
       }
 
-      // doc: Takes a photo_set_id
       var photos_for_set_url = function(photo_set_id, page, per_page){
         return flickr_url_builder({
           'method': 'flickr.photosets.getPhotos',
@@ -103,10 +98,14 @@
 
       var load_photo = function(index, cb){
         $.get(photos_for_set_url(photo_set_id, index+1, 1), function(resp){
-          $.get(photo_info_url(resp.photoset.photo[0].id), function(resp){
-            photo_list[index] = resp.sizes.size;
-            cb();
-          });
+          if(index >= resp.photoset.total || resp.message == "Photoset not found"){
+            no_more_photos();
+          } else {
+            $.get(photo_info_url(resp.photoset.photo[0].id), function(resp){
+              photo_list[index] = resp.sizes.size;
+              cb();
+            });
+          }
         });
       }
 
@@ -138,6 +137,7 @@
         if(count === 0){
           $("#show-more").show();
           $("#loading").hide();
+          $win.on('scroll', load_on_scroll)
         } else {
           $("#show-more").hide();
           $("#loading").show();
@@ -147,8 +147,22 @@
         }
       }
 
+      var load_on_scroll = function() {
+        var load_threshold = 500;
+        var scroll_bottom = $html.scrollTop() + $win.height();
+        var page_bottom = $html.height()
+        if(page_bottom - scroll_bottom < load_threshold){
+          $win.off('scroll', load_on_scroll);
+          show_more_photos(per_page)
+        }
+      }
+
+      let no_more_photos = function(){
+        $win.off('scroll', load_on_scroll);
+        $("#loading").html("Fin")
+      }
+
       // Kick it off
-      $('#show-more').on('click', function(){show_more_photos(per_page)});
       show_more_photos(per_page)
     </script>
 
