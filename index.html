@@ -122,14 +122,13 @@
       }
 
       var do_show_photo = function(index){
-        var medium_800 = _.find(photo_list[index-1], function(size){
+        var medium = _.find(photo_list[index], function(size){
             return size.label === "Medium 800" || size.label == "Original";
           })
-        var original = _.find(photo_list[index-1], function(size){
+        var original = _.find(photo_list[index], function(size){
             return size.label === "Original";
           })
-        if(!original){ console.log(photo_list[index-1])}
-        if(medium_800) $('#photos').append('<a class="photo" href="'+original.source+'"><img src="'+ medium_800.source +'"></a>');
+        if(medium) $('#photos').append('<a class="photo" href="'+original.source+'"><img src="'+ medium.source +'"></a>');
       }
 
 
