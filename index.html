@@ -98,7 +98,7 @@
 
       var load_photo = function(index, cb){
         $.get(photos_for_set_url(photo_set_id, index+1, 1), function(resp){
-          if(index >= resp.photoset.total || resp.message == "Photoset not found"){
+          if(resp.message && resp.message == "Photoset not found"){
             no_more_photos();
           } else {
             $.get(photo_info_url(resp.photoset.photo[0].id), function(resp){
