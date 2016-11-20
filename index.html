@@ -41,10 +41,17 @@
         text-shadow: 1px 2px 2px rgba(0,0,0,.9);
         color: #999;
       }
+      .left-palm, .right-palm{
+        display: inline-block;
+        transform: scaleY(1.5);
+      }
+      .right-palm{
+        transform: scaleY(1.5) scaleX(-1);
+      }
     </style>
   </head>
   <body>
-    <h1 id="logo">🌴 <span>Turbo Disco</span> 🌴</h1>
+    <h1 id="logo"><div class="left-palm">🌴</div> <span>Turbo Disco</span> <div class="right-palm">🌴</div></h1>
     <div id="photos"></div>
     <div id="loading">Loading</div>
     <script>
